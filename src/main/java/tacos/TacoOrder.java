@@ -1,9 +1,9 @@
 package tacos;
 import lombok.Data;
 import org.hibernate.validator.constraints.CreditCardNumber;
-import org.springframework.data.annotation.Id;
 import org.springframework.data.relational.core.mapping.Table;
 
+import javax.persistence.*;
 import javax.validation.constraints.Digits;
 import javax.validation.constraints.NotBlank;
 import javax.validation.constraints.Pattern;
@@ -12,12 +12,13 @@ import java.util.Date;
 import java.util.List;
 
 @Data
-@Table //with table annotation, all other properties will be mapped automatically to column based on their property names.
+@Entity
 public class TacoOrder {
 
     private static final long serialVersionUID = 1L;
 
     @Id
+    @GeneratedValue(strategy = GenerationType.AUTO)
     private Long id;
     private Date placedAt;
 
@@ -42,6 +43,7 @@ public class TacoOrder {
     @Digits(integer = 3, fraction = 0, message = "Invalid CVV")
     private String ccCVV;
 
+    @OneToMany(cascade = CascadeType.ALL) // if the order is deleted, its related tacos will also be deleted.
     private List<Taco> tacos = new ArrayList<>();
     public void addTaco (Taco taco){
         this.tacos.add(taco);

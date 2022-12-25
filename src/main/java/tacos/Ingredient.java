@@ -4,19 +4,24 @@ import lombok.AccessLevel;
 import lombok.AllArgsConstructor;
 import lombok.Data;
 import lombok.NoArgsConstructor;
-import org.springframework.data.annotation.Id;
+
 import org.springframework.data.relational.core.mapping.Table;
 
+import javax.persistence.Entity;
+import javax.persistence.Id;
+
 @Data
-@Table //with table annotation, all other properties will be mapped automatically to column based on their property names.
+@Entity
 @AllArgsConstructor
-@NoArgsConstructor (access = AccessLevel.PRIVATE, force = true)
+@NoArgsConstructor (access = AccessLevel.PROTECTED, force = true)
 public class Ingredient {
 
     @Id
     private final String id;
     private final String name;
     private final Type type;
+
+
 
     public enum Type {
         WRAP, PROTEIN, VEGGIES, CHEESE, SAUCE
