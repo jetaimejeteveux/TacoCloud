@@ -1,21 +1,30 @@
 package tacos;
 
+import com.datastax.oss.driver.api.core.uuid.Uuids;
 import lombok.Data;
+import org.springframework.data.cassandra.core.cql.Ordering;
+import org.springframework.data.cassandra.core.cql.PrimaryKeyType;
+import org.springframework.data.cassandra.core.mapping.Column;
+import org.springframework.data.cassandra.core.mapping.PrimaryKeyColumn;
+import org.springframework.data.cassandra.core.mapping.Table;
 
 
-import javax.persistence.*;
+
 import javax.validation.constraints.NotNull;
 import javax.validation.constraints.Size;
+import java.util.ArrayList;
 import java.util.Date;
 import java.util.List;
+import java.util.UUID;
 
 @Data
-@Entity
+@Table //persist the taco tables
 public class Taco {
-    private static final long serialVersionUID = 1L;
-    @Id //designates the id property as being the identity for a TacoOrder
-    @GeneratedValue(strategy = GenerationType.AUTO)
-    private Long id;
+
+    @PrimaryKeyColumn(type= PrimaryKeyType.PARTITIONED) //define partition key
+    private UUID id = Uuids.timeBased();
+
+    @PrimaryKeyColumn(type= PrimaryKeyType.CLUSTERED, ordering = Ordering.DESCENDING) //define clustered key
     private Date createdAt = new Date();
 
     @NotNull
@@ -26,11 +35,11 @@ public class Taco {
 
 
     @Size(min=1, message="You must choose at least 1 ingredient")
-    @ManyToMany()
-    private List<Ingredient> ingredients;
+    @Column("ingredients")
+    private List<IngredientUDT> ingredients = new ArrayList<>();
 
     public void addIngredient(Ingredient ingredient) {
-        this.ingredients.add(ingredient);
+        this.ingredients.add(TacoUDRUtils.toIngredientUDT(ingredient));
     }
 
 }
